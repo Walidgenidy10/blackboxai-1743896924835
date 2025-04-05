@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Reviews - HR System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .star-rating {
+            direction: rtl;
+            unicode-bidi: bidi-override;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            color: #ddd;
+            font-size: 1.5rem;
+            padding: 0 3px;
+            cursor: pointer;
+        }
+        .star-rating input:checked ~ label {
+            color: #f5c518;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #f5c518;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-users-cog text-2xl"></i>
+                <h1 class="text-xl font-bold">HR Portal</h1>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="index.html" class="hover:text-blue-200">Home</a>
+                <a href="dashboard.html" class="hover:text-blue-200">Dashboard</a>
+                <a href="employees.html" class="hover:text-blue-200">Employees</a>
+                <a href="leaves.html" class="hover:text-blue-200">Leaves</a>
+                <a href="performance.html" class="hover:text-blue-200">Performance</a>
+            </div>
+            <button class="md:hidden">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Performance Review Section -->
+    <section class="container mx-auto py-12 px-4">
+        <h2 class="text-3xl font-bold text-center mb-8">Performance Reviews</h2>
+        
+        <!-- Performance Review Form -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h3 class="text-xl font-semibold mb-4">Submit Performance Review</h3>
+            <form id="reviewForm" class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 mb-2">Employee Name</label>
+                    <input type="text" id="reviewName" required 
+                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2">Employee ID</label>
+                    <input type="text" id="reviewEmpId" required 
+                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 mb-2">Rating</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5" />
+                        <label for="star5" title="5 stars">★</label>
+                        <input type="radio" id="star4" name="rating" value="4" />
+                        <label for="star4" title="4 stars">★</label>
+                        <input type="radio" id="star3" name="rating" value="3" />
+                        <label for="star3" title="3 stars">★</label>
+                        <input type="radio" id="star2" name="rating" value="2" />
+                        <label for="star2" title="2 stars">★</label>
+                        <input type="radio" id="star1" name="rating" value="1" />
+                        <label for="star1" title="1 star">★</label>
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 mb-2">Feedback</label>
+                    <textarea id="reviewFeedback" rows="4" required
+                              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 mb-2">Review Date</label>
+                    <input type="date" id="reviewDate" required 
+                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Performance Reviews Table -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Performance History</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="py-2 px-4 border">Employee</th>
+                            <th class="py-2 px-4 border">ID</th>
+                            <th class="py-2 px-4 border">Rating</th>
+                            <th class="py-2 px-4 border">Feedback</th>
+                            <th class="py-2 px-4 border">Date</th>
+                            <th class="py-2 px-4 border">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewsTable">
+                        <!-- Review data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2023 HR Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Performance review functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load reviews from localStorage
+            loadReviews();
+
+            // Form submission handler
+            document.getElementById('reviewForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const rating = document.querySelector('input[name="rating"]:checked')?.value || 0;
+                
+                const review = {
+                    id: Date.now(),
+                    name: document.getElementById('reviewName').value,
+                    empId: document.getElementById('reviewEmpId').value,
+                    rating: parseInt(rating),
+                    feedback: document.getElementById('reviewFeedback').value,
+                    date: document.getElementById('reviewDate').value || new Date().toISOString().split('T')[0]
+                };
+
+                // Save to localStorage
+                const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+                reviews.push(review);
+                localStorage.setItem('reviews', JSON.stringify(reviews));
+                localStorage.setItem('latestReview', `${review.name} - ${review.rating}★`);
+
+                // Update UI
+                loadReviews();
+                this.reset();
+            });
+        });
+
+        function loadReviews() {
+            const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+            const tableBody = document.getElementById('reviewsTable');
+            tableBody.innerHTML = '';
+
+            reviews.forEach(review => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                
+                // Create star rating display
+                let stars = '';
+                for (let i = 0; i < 5; i++) {
+                    stars += i < review.rating ? '★' : '☆';
+                }
+                
+                row.innerHTML = `
+                    <td class="py-2 px-4 border">${review.name}</td>
+                    <td class="py-2 px-4 border">${review.empId}</td>
+                    <td class="py-2 px-4 border">
+                        <span class="text-yellow-500">${stars}</span>
+                    </td>
+                    <td class="py-2 px-4 border">${review.feedback}</td>
+                    <td class="py-2 px-4 border">${review.date}</td>
+                    <td class="py-2 px-4 border">
+                        <button onclick="deleteReview(${review.id})" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteReview(id) {
+            let reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+            reviews = reviews.filter(review => review.id !== id);
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            
+            // Update latest review if needed
+            if (reviews.length > 0) {
+                const latest = reviews[reviews.length - 1];
+                localStorage.setItem('latestReview', `${latest.name} - ${latest.rating}★`);
+            } else {
+                localStorage.setItem('latestReview', 'N/A');
+            }
+            
+            loadReviews();
+        }
+    </script>
+</body>
+</html>
