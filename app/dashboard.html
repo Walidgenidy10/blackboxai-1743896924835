@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Portal - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="common.js"></script>
+</head>
+<body class="bg-gray-100">
+  <!-- Include Navigation -->
+  <div id="nav-container"></div>
+
+  <div class="container mx-auto px-4 py-8">
+    <!-- Dashboard Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">HR Dashboard</h1>
+        <p class="text-gray-600">Welcome back, <span id="user-name" class="font-medium">Admin</span></p>
+      </div>
+      <div class="mt-4 md:mt-0 flex space-x-4">
+        <div class="bg-white p-3 rounded-lg shadow-sm flex items-center">
+          <i class="fas fa-calendar-day text-blue-500 mr-2"></i>
+          <span id="current-date" class="text-gray-700"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500">Total Employees</p>
+            <h3 class="text-3xl font-bold text-gray-800">124</h3>
+          </div>
+          <div class="bg-blue-100 p-3 rounded-full">
+            <i class="fas fa-users text-blue-500 text-xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <span class="text-green-500 text-sm font-medium">+5.2% from last month</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500">Pending Leaves</p>
+            <h3 class="text-3xl font-bold text-gray-800">8</h3>
+          </div>
+          <div class="bg-yellow-100 p-3 rounded-full">
+            <i class="fas fa-calendar-minus text-yellow-500 text-xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <span class="text-red-500 text-sm font-medium">+2 from yesterday</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500">Active Today</p>
+            <h3 class="text-3xl font-bold text-gray-800">89</h3>
+          </div>
+          <div class="bg-green-100 p-3 rounded-full">
+            <i class="fas fa-user-check text-green-500 text-xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <span class="text-green-500 text-sm font-medium">92% attendance</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-500">Open Positions</p>
+            <h3 class="text-3xl font-bold text-gray-800">5</h3>
+          </div>
+          <div class="bg-purple-100 p-3 rounded-full">
+            <i class="fas fa-briefcase text-purple-500 text-xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <span class="text-blue-500 text-sm font-medium">3 new this week</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity and Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Recent Activity -->
+      <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-800">Recent Activity</h2>
+          <a href="#" class="text-blue-500 text-sm font-medium">View All</a>
+        </div>
+        <div class="space-y-4">
+          <div class="flex items-start">
+            <div class="bg-blue-100 p-2 rounded-full mr-4">
+              <i class="fas fa-user-plus text-blue-500"></i>
+            </div>
+            <div>
+              <p class="font-medium">New employee onboarded</p>
+              <p class="text-gray-500 text-sm">Sarah Johnson joined as Marketing Manager</p>
+              <p class="text-gray-400 text-xs mt-1">2 hours ago</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="bg-yellow-100 p-2 rounded-full mr-4">
+              <i class="fas fa-calendar-alt text-yellow-500"></i>
+            </div>
+            <div>
+              <p class="font-medium">Leave request submitted</p>
+              <p class="text-gray-500 text-sm">Michael Brown requested vacation leave</p>
+              <p class="text-gray-400 text-xs mt-1">5 hours ago</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="bg-green-100 p-2 rounded-full mr-4">
+              <i class="fas fa-check-circle text-green-500"></i>
+            </div>
+            <div>
+              <p class="font-medium">Performance review completed</p>
+              <p class="text-gray-500 text-sm">Annual review for Emily Chen</p>
+              <p class="text-gray-400 text-xs mt-1">Yesterday</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <a href="employees-new.html" class="bg-blue-50 hover:bg-blue-100 p-4 rounded-lg text-center transition-colors">
+            <i class="fas fa-user-plus text-blue-500 text-2xl mb-2"></i>
+            <p class="text-sm font-medium">Add Employee</p>
+          </a>
+          <a href="leaves.html" class="bg-green-50 hover:bg-green-100 p-4 rounded-lg text-center transition-colors">
+            <i class="fas fa-calendar-check text-green-500 text-2xl mb-2"></i>
+            <p class="text-sm font-medium">Manage Leaves</p>
+          </a>
+          <a href="attendance.html" class="bg-purple-50 hover:bg-purple-100 p-4 rounded-lg text-center transition-colors">
+            <i class="fas fa-user-clock text-purple-500 text-2xl mb-2"></i>
+            <p class="text-sm font-medium">View Attendance</p>
+          </a>
+          <a href="performance.html" class="bg-yellow-50 hover:bg-yellow-100 p-4 rounded-lg text-center transition-colors">
+            <i class="fas fa-chart-line text-yellow-500 text-2xl mb-2"></i>
+            <p class="text-sm font-medium">Performance</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Load navigation
+    fetch('nav.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('nav-container').innerHTML = data;
+      });
+
+    // Set current date
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+
+    // Check authentication
+    if (!localStorage.getItem('authToken')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
