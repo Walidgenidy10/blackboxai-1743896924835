@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Attendance - HR Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="geolocation-service.js"></script>
+    <script src="common.js"></script>
+    <style>
+        .action-btn { transition: all 0.3s ease; }
+        .action-btn:hover { transform: scale(1.05); }
+        #photoPreview { max-width: 200px; max-height: 150px; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-2xl font-bold text-center mb-6">Simple Attendance</h2>
+        
+        <!-- Geolocation Verification -->
+        <div class="mb-4">
+            <button id="getLocationBtn" class="w-full bg-blue-100 text-blue-700 py-2 px-4 rounded-lg hover:bg-blue-200">
+                <i class="fas fa-map-marker-alt mr-2"></i> Verify Location
+            </button>
+            <div id="locationStatus" class="text-sm mt-2 hidden">
+                <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                <span id="statusLabel">Verified: </span>
+                <span id="coordinates"></span>
+            </div>
+        </div>
+
+        <!-- Clock In/Out Buttons -->
+        <div class="grid grid-cols-2 gap-4">
+            <button id="clockInBtn" class="action-btn bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg" disabled>
+                <i class="fas fa-sign-in-alt mr-2"></i> Clock In
+            </button>
+            <button id="clockOutBtn" class="action-btn bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg" disabled>
+                <i class="fas fa-sign-out-alt mr-2"></i> Clock Out
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!localStorage.getItem('hr_isLoggedIn')) {
+                window.location.href = 'login.html';
+            }
+
+            // Geolocation Verification
+            document.getElementById('getLocationBtn').addEventListener('click', async () => {
+                try {
+                    const location = await GeolocationService.getLocation();
+                    const status = GeolocationService.getLocationStatus(location);
+                    
+                    document.getElementById('coordinates').textContent = status.text;
+                    document.getElementById('statusLabel').textContent = status.label + ': ';
+                    document.getElementById('locationStatus').className = `text-sm mt-2`;
+                    document.getElementById('locationStatus').querySelector('i').className = `fas ${status.icon} mr-1`;
+                    
+                    // Enable clock-in if location verified
+                    document.getElementById('clockInBtn').disabled = false;
+                } catch (error) {
+                    console.error('Location verification failed:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
