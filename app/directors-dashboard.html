@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Director Dashboard - HR System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="common.js"></script>
+    <style>
+        .chart-container {
+            height: 300px;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-user-tie text-2xl"></i>
+                <h1 class="text-xl font-bold">Director Portal</h1>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="directors-dashboard.html" class="hover:text-blue-200">Dashboard</a>
+                <a href="employees.html" class="hover:text-blue-200">Employees</a>
+                <a href="leaves.html" class="hover:text-blue-200">Leaves</a>
+                <a href="performance.html" class="hover:text-blue-200">Performance</a>
+            </div>
+            <button class="md:hidden">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Director Dashboard Section -->
+    <section class="container mx-auto py-8 px-4">
+        <h1 class="text-3xl font-bold text-center mb-2">Executive Dashboard</h1>
+        <p class="text-center text-gray-600 mb-8">Key metrics and insights for leadership</p>
+
+        <!-- Top Metrics -->
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="metric-card bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-500">
+                <h3 class="text-lg font-semibold mb-2">Total Employees</h3>
+                <p id="totalEmployees" class="text-3xl font-bold">0</p>
+            </div>
+            <div class="metric-card bg-white p-6 rounded-lg shadow-md border-t-4 border-green-500">
+                <h3 class="text-lg font-semibold mb-2">Active Employees</h3>
+                <p id="activeEmployees" class="text-3xl font-bold">0</p>
+            </div>
+            <div class="metric-card bg-white p-6 rounded-lg shadow-md border-t-4 border-yellow-500">
+                <h3 class="text-lg font-semibold mb-2">Avg. Performance</h3>
+                <p id="avgPerformance" class="text-3xl font-bold">0.0</p>
+            </div>
+            <div class="metric-card bg-white p-6 rounded-lg shadow-md border-t-4 border-red-500">
+                <h3 class="text-lg font-semibold mb-2">Turnover Rate</h3>
+                <p id="turnoverRate" class="text-3xl font-bold">0%</p>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Department Distribution</h3>
+                <div class="chart-container" id="deptChart">
+                    <p class="text-center text-gray-500 mt-32">Chart will appear here</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Leave Trends</h3>
+                <div class="chart-container" id="leaveChart">
+                    <p class="text-center text-gray-500 mt-32">Chart will appear here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Metrics -->
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Top Performers</h3>
+                <div id="topPerformers" class="space-y-3">
+                    <p class="text-gray-500">No performance data available</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Recent Leaves</h3>
+                <div id="recentLeaves" class="space-y-3">
+                    <p class="text-gray-500">No recent leave data</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Attention Needed</h3>
+                <div id="attentionItems" class="space-y-3">
+                    <p class="text-gray-500">No items requiring attention</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2023 HR Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is director
+            if (getRole() !== 'director') {
+                window.location.href = 'dashboard-new.html';
+            }
+
+            // Load mock data (in real app, this would come from API)
+            loadDirectorMetrics();
+        });
+
+        function loadDirectorMetrics() {
+            // Mock data - replace with actual data loading
+            const mockData = {
+                totalEmployees: 142,
+                activeEmployees: 135,
+                avgPerformance: 4.2,
+                turnoverRate: 5.2,
+                topPerformers: [
+                    {name: 'Sarah Johnson', rating: 5, dept: 'Engineering'},
+                    {name: 'Michael Chen', rating: 5, dept: 'Marketing'},
+                    {name: 'David Wilson', rating: 4.8, dept: 'Sales'}
+                ],
+                recentLeaves: [
+                    {name: 'Emma Davis', type: 'Vacation', days: 10},
+                    {name: 'Robert Brown', type: 'Sick', days: 3},
+                    {name: 'Lisa Miller', type: 'Parental', days: 90}
+                ],
+                attentionItems: [
+                    '3 employees with overdue reviews',
+                    '2 open positions needing approval',
+                    '1 employee with low performance'
+                ]
+            };
+
+            // Update metrics
+            document.getElementById('totalEmployees').textContent = mockData.totalEmployees;
+            document.getElementById('activeEmployees').textContent = mockData.activeEmployees;
+            document.getElementById('avgPerformance').textContent = mockData.avgPerformance;
+            document.getElementById('turnoverRate').textContent = mockData.turnoverRate + '%';
+
+            // Update top performers
+            const performersList = document.getElementById('topPerformers');
+            performersList.innerHTML = mockData.topPerformers.map(emp => 
+                `<div class="flex items-center justify-between">
+                    <span>${emp.name}</span>
+                    <span class="text-yellow-500">${'★'.repeat(Math.floor(emp.rating))}${'☆'.repeat(5-Math.floor(emp.rating))}</span>
+                </div>`
+            ).join('');
+
+            // Update recent leaves
+            const leavesList = document.getElementById('recentLeaves');
+            leavesList.innerHTML = mockData.recentLeaves.map(leave => 
+                `<div class="flex items-center justify-between">
+                    <span>${leave.name}</span>
+                    <span class="text-blue-600">${leave.days}d ${leave.type}</span>
+                </div>`
+            ).join('');
+
+            // Update attention items
+            const attentionList = document.getElementById('attentionItems');
+            attentionList.innerHTML = mockData.attentionItems.map(item => 
+                `<div class="flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                    <span>${item}</span>
+                </div>`
+            ).join('');
+        }
+    </script>
+</body>
+</html>
