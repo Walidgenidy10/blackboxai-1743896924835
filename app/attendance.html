@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System - HR Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="common.js"></script>
+    <style>
+        .action-btn {
+            transition: all 0.3s ease;
+            transform: scale(1);
+        }
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-fingerprint text-2xl"></i>
+                <h1 class="text-xl font-bold">Attendance System</h1>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="dashboard-new.html" class="hover:text-blue-200">Dashboard</a>
+                <a href="attendance.html" class="hover:text-blue-200">Attendance</a>
+                <a href="employees.html" class="hover:text-blue-200">Profile</a>
+            </div>
+            <button class="md:hidden">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Attendance Section -->
+    <section class="container mx-auto py-8 px-4">
+        <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mb-8">
+            <h2 class="text-2xl font-bold text-center mb-6">Clock In/Out</h2>
+            
+            <!-- Current Status -->
+            <div class="text-center mb-8">
+                <div id="currentStatus" class="text-lg font-semibold mb-2">Status: Not Checked In</div>
+                <div id="currentTime" class="text-3xl font-mono font-bold mb-4">00:00:00</div>
+                <div id="lastAction" class="text-gray-500 text-sm">Last action: Never</div>
+            </div>
+
+                        <!-- Location Verification -->
+            <div class="mb-6 space-y-4">
+                <div>
+                    <label class="block text-gray-700 mb-2">Location Verification</label>
+                    <button id="getLocationBtn" class="w-full bg-blue-100 text-blue-700 py-2 px-4 rounded-lg hover:bg-blue-200">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Verify My Location
+                    </button>
+                    <div id="locationStatus" class="text-sm mt-2 hidden">
+                        <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                        <span>Verified: </span>
+                        <span id="verifiedLocation"></span>
+                    </div>
+                </div>
+
+                <!-- Photo Capture -->
+                <div class="border-t pt-4">
+                    <label class="block text-gray-700 mb-2">Photo Verification</label>
+                    <div class="flex items-center space-x-4">
+                        <video id="video" width="160" height="120" class="border rounded-lg hidden"></video>
+                        <canvas id="canvas" width="160" height="120" class="border rounded-lg hidden"></canvas>
+                        <button id="captureBtn" class="bg-blue-100 text-blue-700 py-2 px-4 rounded-lg hover:bg-blue-200 hidden">
+                            <i class="fas fa-camera mr-2"></i> Capture
+                        </button>
+                    </div>
+                    <button id="startCameraBtn" class="mt-2 bg-blue-100 text-blue-700 py-2 px-4 rounded-lg hover:bg-blue-200">
+                        <i class="fas fa-video mr-2"></i> Start Camera
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-4">
+                <button id="clockInBtn" class="action-btn bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg pulse">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Clock In
+                </button>
+                <button id="clockOutBtn" class="action-btn bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-lg" disabled>
+                    <i class="fas fa-sign-out-alt mr-2"></i> Clock Out
+                </button>
+            </div>
+        </div>
+
+        <!-- Attendance History -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <h2 class="text-2xl font-bold mb-4">Your Attendance History</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-2 px-4 text-left">Date</th>
+                            <th class="py-2 px-4 text-left">Clock In</th>
+                            <th class="py-2 px-4 text-left">Clock Out</th>
+                            <th class="py-2 px-4 text-left">Location</th>
+                            <th class="py-2 px-4 text-left">Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceHistory">
+                        <!-- Attendance records will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2023 HR Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            if (!localStorage.getItem('hr_isLoggedIn')) {
+                window.location.href = 'login.html';
+            }
+
+            // Update current time
+            function updateClock() {
+                const now = new Date();
+                document.getElementById('currentTime').textContent = 
+                    `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // Load attendance history
+            loadAttendanceHistory();
+
+            // Clock In/Out functionality
+            document.getElementById('clockInBtn').addEventListener('click', clockIn);
+            document.getElementById('clockOutBtn').addEventListener('click', clockOut);
+        });
+
+        function loadAttendanceHistory() {
+            const attendance = JSON.parse(localStorage.getItem('attendance') || '[]');
+            const userAttendance = attendance.filter(record => 
+                record.empId === localStorage.getItem('hr_username'));
+            
+            const tableBody = document.getElementById('attendanceHistory');
+            tableBody.innerHTML = userAttendance.map(record => `
+                <tr class="hover:bg-gray-50">
+                    <td class="py-2 px-4 border">${record.date}</td>
+                    <td class="py-2 px-4 border">${record.clockIn}</td>
+                    <td class="py-2 px-4 border">${record.clockOut || '-'}</td>
+                    <td class="py-2 px-4 border">${record.location}</td>
+                    <td class="py-2 px-4 border">${record.hours || '-'}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" class="py-4 text-center text-gray-500">No attendance records found</td></tr>';
+
+            // Update last action if exists
+            if (userAttendance.length > 0) {
+                const lastRecord = userAttendance[userAttendance.length - 1];
+                document.getElementById('lastAction').textContent = 
+                    `Last action: ${lastRecord.clockOut ? 'Clocked Out' : 'Clocked In'} at ${lastRecord.clockOut || lastRecord.clockIn}`;
+                
+                // Update current status
+                if (!lastRecord.clockOut) {
+                    document.getElementById('currentStatus').textContent = 'Status: Currently Checked In';
+                    document.getElementById('clockInBtn').disabled = true;
+                    document.getElementById('clockOutBtn').disabled = false;
+                    document.getElementById('clockInBtn').classList.remove('pulse');
+                }
+            }
+        }
+
+        function clockIn() {
+            const now = new Date();
+            const location = document.getElementById('location').value;
+            
+            const record = {
+                empId: localStorage.getItem('hr_username'),
+                name: localStorage.getItem('hr_username'),
+                date: now.toISOString().split('T')[0],
+                clockIn: now.toTimeString().substring(0, 8),
+                location: location.charAt(0).toUpperCase() + location.slice(1).replace('-', ' '),
+                clockOut: null,
+                hours: null
+            };
+
+            const attendance = JSON.parse(localStorage.getItem('attendance') || '[]');
+            attendance.push(record);
+            localStorage.setItem('attendance', JSON.stringify(attendance));
+
+            // Update UI
+            document.getElementById('currentStatus').textContent = 'Status: Currently Checked In';
+            document.getElementById('lastAction').textContent = `Last action: Clocked In at ${record.clockIn}`;
+            document.getElementById('clockInBtn').disabled = true;
+            document.getElementById('clockOutBtn').disabled = false;
+            document.getElementById('clockInBtn').classList.remove('pulse');
+            
+            loadAttendanceHistory();
+        }
+
+        function clockOut() {
+            const now = new Date();
+            const attendance = JSON.parse(localStorage.getItem('attendance') || '[]');
+            const lastRecord = attendance.findLast(record => 
+                record.empId === localStorage.getItem('hr_username') && !record.clockOut);
+            
+            if (lastRecord) {
+                lastRecord.clockOut = now.toTimeString().substring(0, 8);
+                
+                // Calculate hours worked
+                const inTime = new Date(`${lastRecord.date}T${lastRecord.clockIn}`);
+                const outTime = new Date(`${now.toISOString().split('T')[0]}T${lastRecord.clockOut}`);
+                lastRecord.hours = ((outTime - inTime) / (1000 * 60 * 60)).toFixed(2);
+                
+                localStorage.setItem('attendance', JSON.stringify(attendance));
+                
+                // Update UI
+                document.getElementById('currentStatus').textContent = 'Status: Not Checked In';
+                document.getElementById('lastAction').textContent = `Last action: Clocked Out at ${lastRecord.clockOut}`;
+                document.getElementById('clockInBtn').disabled = false;
+                document.getElementById('clockOutBtn').disabled = true;
+                document.getElementById('clockInBtn').classList.add('pulse');
+                
+                loadAttendanceHistory();
+            }
+        }
+    </script>
+</body>
+</html>
