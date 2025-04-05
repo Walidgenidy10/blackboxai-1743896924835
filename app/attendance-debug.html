@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Debug - HR Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="geolocation-service-debug.js"></script>
+    <script src="common.js"></script>
+    <style>
+        .btn {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .btn-loading:after {
+            content: " ";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            margin-top: -10px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #debugConsole {
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
+        <h1 class="text-2xl font-bold text-center mb-6 text-blue-600">
+            <i class="fas fa-bug mr-2"></i>Attendance Debug
+        </h1>
+        
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <button id="verifyBtn" class="w-full btn bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg">
+                <i class="fas fa-map-marker-alt mr-2"></i> Verify Location
+            </button>
+            <div id="statusContainer" class="mt-3 hidden">
+                <div class="flex items-start p-3 bg-gray-100 rounded-lg">
+                    <i id="statusIcon" class="fas mt-1 mr-3 text-lg"></i>
+                    <div>
+                        <div id="statusText" class="font-medium"></div>
+                        <div id="statusDetails" class="text-sm text-gray-600 mt-1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button id="clockInBtn" class="btn bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg" disabled>
+                Clock In
+            </button>
+            <button id="clockOutBtn" class="btn bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg" disabled>
+                Clock Out
+            </button>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="font-bold mb-2 flex items-center">
+                <i class="fas fa-terminal mr-2"></i>Debug Console
+            </h3>
+            <div id="debugConsole" class="bg-black text-green-400 p-2 rounded h-32 overflow-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize console capture
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error,
+            info: console.info,
+            debug: console.debug
+        };
+
+        function captureLog(method) {
+            return function(...args) {
+                originalConsole[method].apply(console, args);
+                const debugConsole = document.getElementById('debugConsole');
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg) : arg
+                ).join(' ');
+                debugConsole.innerHTML += `[${method.toUpperCase()}] ${message}\n`;
+                debugConsole.scrollTop = debugConsole.scrollHeight;
+            };
+        }
+
+        // Override console methods
+        console.log = captureLog('log');
+        console.warn = captureLog('warn');
+        console.error = captureLog('error');
+        console.info = captureLog('info');
+        console.debug = captureLog('debug');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('hr_isLoggedIn')) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const verifyBtn = document.getElementById('verifyBtn');
+            verifyBtn.addEventListener('click', verifyLocation);
+
+            console.log('Debug attendance system initialized');
+        });
+
+        async function verifyLocation() {
+            const btn = document.getElementById('verifyBtn');
+            const statusContainer = document.getElementById('statusContainer');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            const statusDetails = document.getElementById('statusDetails');
+            
+            // Set loading state
+            btn.disabled = true;
+            btn.classList.add('btn-loading');
+            statusContainer.classList.add('hidden');
+
+            try {
+                console.log('Starting location verification...');
+                const location = await GeolocationService.getLocation();
+                
+                // Update UI
+                statusIcon.className = `fas ${GeolocationService.getStatusIcon(location.isMock)}`;
+                statusText.textContent = location.isMock 
+                    ? 'Using Mock Location' 
+                    : 'Location Verified';
+                statusDetails.textContent = `Lat: ${location.lat.toFixed(4)}, Long: ${location.long.toFixed(4)}`;
+                statusContainer.classList.remove('hidden');
+                
+                // Enable clock-in
+                document.getElementById('clockInBtn').disabled = false;
+                console.log('Location verification successful');
+            } catch (error) {
+                console.error('Location verification failed:', error);
+                statusIcon.className = 'fas fa-times-circle text-red-500';
+                statusText.textContent = 'Verification Failed';
+                statusDetails.textContent = error.message || 'Unknown error occurred';
+                statusContainer.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('btn-loading');
+            }
+        }
+    </script>
+</body>
+</html>
